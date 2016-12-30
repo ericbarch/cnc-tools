@@ -24,6 +24,12 @@ boolean inComment = false;
 // flag that tells us if a new program has been loaded in while running
 boolean newProgram = false;
 
+// interrupt commands
+#define PENDING_CMD_BUF_SIZE 1000
+byte pendingCmdData[PENDING_CMD_BUF_SIZE];
+boolean pendingCmd = false;
+int pendingBytes = 0;
+
 // telnet defaults to port 23
 EthernetServer server(23);
 
@@ -31,6 +37,9 @@ EthernetServer server(23);
 void setup() {
   // initial settle delay
   delay(500);
+
+  // init serial
+  Serial.begin(115200);
   
   // initialize the ethernet device
   Ethernet.begin(mac, ip, gateway, subnet);
@@ -287,6 +296,45 @@ boolean checkForNewFile() {
   return false;
 }
 
+void checkForSerialData() {
+  if (Serial.available() > 0) {
+    // read the incoming byte:
+    byte incomingByte = Serial.read();
+
+    // if we see a new line, consider the command as fully received
+    if (incomingByte == 0xA) {
+      pendingCmd = true;
+    } else if (pendingCmd || pendingBytes >= PENDING_CMD_BUF_SIZE) {
+      // if new data is showing up and we already have a pendingCmd, clear it and replace it
+      pendingCmd = false;
+      pendingBytes = 0;
+    }
+
+    pendingCmdData[pendingBytes] = incomingByte;
+    pendingBytes++;
+  }
+}
+
+void sendCustomCommandIfPending() {
+  if (pendingCmd) {
+    for (int i = 0; i < pendingBytes; i++) {
+      byte newChar = pendingCmdData[i];
+
+      // wait for tape feed to go high
+      while (digitalRead(TAPE_FEED_PIN) == LOW) {}
+
+      // send char to machine
+      sendChar(newChar);
+      // send via telnet to anyone connected
+      server.write(newChar);
+    }
+
+    // the command has been transmitted
+    pendingCmd = false;
+    pendingBytes = 0;
+  }
+}
+
 void loop() {
   cncProgram = SD.open("cnc.txt", FILE_READ);
   
@@ -297,6 +345,8 @@ void loop() {
 
   // read from the file until there's nothing else in it:
   while (cncProgram.available() && !newProgram) {
+    checkForSerialData();
+
     char newChar = cncProgram.read();
 
     if (newChar == '(')
@@ -311,6 +361,9 @@ void loop() {
         // new program was loaded, break from the loop
         break;
       }
+
+      // check for new serial data
+      checkForSerialData();
     }
 
     if (!newProgram) {
@@ -319,6 +372,11 @@ void loop() {
 
       // send via telnet to anyone connected
       server.write(newChar);
+
+      if (newChar == 0xA) {
+        // new line, let's send a command if pending
+        sendCustomCommandIfPending();
+      }
     }
   }
 
