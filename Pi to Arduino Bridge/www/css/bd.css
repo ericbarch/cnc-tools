@@ -1,0 +1,14 @@
+#console p {
+  margin-top: 0;
+  margin-left: 2px;
+  margin-bottom: 0;
+  margin-right: 0;
+}
+
+#console {
+  background-color: black;
+  color: white;
+  height: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "cnc-control",
+  "version": "0.0.1",
+  "description": "Commands relays and the Arduino optic emulator.",
+  "author": "Eric Barch <ebarch@nooplabs.com>",
+  "main": "./index.js",
+  "dependencies": {
+    "express":              "4.14.x",
+    "serialport":           "4.0.x",
+    "socket.io":            "1.7.x",
+    "pi-gpio":              "0.0.x"
+  }
+}
