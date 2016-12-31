@@ -327,6 +327,8 @@ void sendCustomCommandIfPending() {
       sendChar(newChar);
       // send via telnet to anyone connected
       server.write(newChar);
+      // send via serial console
+      Serial.write(newChar);
     }
 
     // the command has been transmitted
@@ -377,6 +379,9 @@ void loop() {
         // new line, let's send a command if pending
         sendCustomCommandIfPending();
       }
+
+      // send via serial console
+      Serial.write(newChar);
     }
   }
 
