@@ -40,8 +40,6 @@ io.on('connection', function(socket){
   socket.emit('console', 'cnc log connected @ ' + new Date());
 
   socket.on('setrelay', (relayNum, state) => {
-    console.log('RELAY: ' + relayNum + ': ' + state);
-
     const relayIndex = relayNum - 1;
     
     if (state === 'off') {
