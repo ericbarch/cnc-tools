@@ -119,17 +119,17 @@
             (function (i) {
                 $('#relay' + i + 'off').click(function() {
                     if (socket.connected) {
-                        socket.emit('setrelay', i, 'off');
+                        socket.emit('setrelay', i - 1, 'off');
                     }
                 });
                 $('#relay' + i + 'on').click(function() {
                     if (socket.connected) {
-                        socket.emit('setrelay', i, 'on');
+                        socket.emit('setrelay', i - 1, 'on');
                     }
                 });
                 $('#relay' + i + 'on5').click(function() {
                     if (socket.connected) {
-                        socket.emit('setrelay', i, 'on5');
+                        socket.emit('setrelay', i - 1, 'on5');
                     }
                 });
             })(i);

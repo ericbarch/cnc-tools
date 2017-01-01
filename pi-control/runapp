@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd /home/pi/cnc-tools/pi-control
+
+# run and relaunch the app if it crashes
+while true; do
+    node index.js
+    sleep 5
+done

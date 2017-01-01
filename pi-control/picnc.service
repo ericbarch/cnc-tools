@@ -1,0 +1,10 @@
+[Unit]
+Description=Pi CNC control interface
+
+[Service]
+User=root
+After=multi-user.target
+ExecStart=/home/pi/cnc-tools/pi-control/runapp
+
+[Install]
+WantedBy=multi-user.target
