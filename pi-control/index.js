@@ -7,18 +7,15 @@ app.use(express.static('www'));
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var SerialPort = require("serialport");
-var gpio = require("pi-gpio");
+var Gpio = require('onoff').Gpio;
 
-// we will use output pins 35, 36, 37, 38
-const FIRST_RELAY_PIN = 35;
+// we will use output pins BCM17/18/27/22 (RPi Physical Pins 11/12/13/15)
+const RELAY_PINS = [17, 18, 27, 22];
+let relays = [];
 
-// init gpio
-for (let i = 0; i < 4; i++) {
-  gpio.open(FIRST_RELAY_PIN + i, 'output pullup', function(err) {     // Open pin for output (active low)
-    gpio.write(FIRST_RELAY_PIN + i, 1, function() {          // Set pin high (1)
-      console.log('Pin ' + (FIRST_RELAY_PIN + i) + ' initialized for output (active low)');
-    });
-  });
+// init gpio (defaulted to pulldown)
+for (let i = 0; i < 4; i ++) {
+  relays.push(new Gpio(RELAY_PINS[i], 'out'));
 }
 
 // init serialport
@@ -44,25 +41,43 @@ io.on('connection', function(socket){
 
   socket.on('setrelay', (relayNum, state) => {
     console.log('RELAY: ' + relayNum + ': ' + state);
+
+    const relayIndex = relayNum - 1;
     
     if (state === 'off') {
-      gpio.write(FIRST_RELAY_PIN + parseInt(relayNum, 10), 1, function() {
-        console.log('Pin ' + FIRST_RELAY_PIN + parseInt(relayNum, 10) + 'set high (off)');
+      relays[relayIndex].write(0, function (err) {
+        if (err) {
+          console.log('Relay ' + relayNum + ' err: ' + err);
+        } else {
+          console.log('Relay ' + relayNum + ' set low (off)');
+        }
       });
     } else if (state === 'on') {
-      gpio.write(FIRST_RELAY_PIN + parseInt(relayNum, 10), 0, function() {
-        console.log('Pin ' + FIRST_RELAY_PIN + parseInt(relayNum, 10) + 'set low (on)');
+      relays[relayIndex].write(1, function (err) {
+        if (err) {
+          console.log('Relay ' + relayNum + ' err: ' + err);
+        } else {
+          console.log('Relay ' + relayNum + ' set high (on)');
+        }
       });
     } else if (state === 'on5') {
-      gpio.write(FIRST_RELAY_PIN + parseInt(relayNum, 10), 0, function() {
-        console.log('Pin ' + FIRST_RELAY_PIN + parseInt(relayNum, 10) + 'set low (on)');
-        console.log('Setting timer for 5 seconds to turn back off...');
+      relays[relayIndex].write(1, function (err) {
+        if (err) {
+          console.log('Relay ' + relayNum + ' err: ' + err);
+        } else {
+          console.log('Relay ' + relayNum + ' set high (on)');
+          console.log('Setting timer for 5 seconds to turn back off...');
 
-        setTimeout(function () {
-          gpio.write(FIRST_RELAY_PIN + parseInt(relayNum, 10), 1, function() {
-            console.log('Pin ' + FIRST_RELAY_PIN + parseInt(relayNum, 10) + 'set high (off)');
-          });
-        }, 5000);
+          setTimeout(function () {
+            relays[relayIndex].write(0, function (err) {
+              if (err) {
+                console.log('Relay ' + relayNum + ' err: ' + err);
+              } else {
+                console.log('Relay ' + relayNum + ' set low (off)');
+              }
+            });
+          }, 5000);
+        }
       });
     }
   });
