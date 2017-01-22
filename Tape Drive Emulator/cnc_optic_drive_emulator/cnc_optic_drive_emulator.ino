@@ -39,7 +39,7 @@ void setup() {
   delay(500);
 
   // init serial
-  Serial.begin(115200);
+  Serial1.begin(115200);
   
   // initialize the ethernet device
   Ethernet.begin(mac, ip, gateway, subnet);
@@ -297,9 +297,9 @@ boolean checkForNewFile() {
 }
 
 void checkForSerialData() {
-  while (Serial.available() > 0) {
+  while (Serial1.available() > 0) {
     // read the incoming byte:
-    byte incomingByte = Serial.read();
+    byte incomingByte = Serial1.read();
 
     // if we see a new line, consider the command as fully received
     if (incomingByte == 0xA) {
@@ -328,7 +328,7 @@ void sendCustomCommandIfPending() {
       // send via telnet to anyone connected
       server.write(newChar);
       // send via serial console
-      Serial.write(newChar);
+      Serial1.write(newChar);
     }
 
     // the command has been transmitted
@@ -371,7 +371,7 @@ void loop() {
       server.write(newChar);
 
       // send via serial console
-      Serial.write(newChar);
+      Serial1.write(newChar);
 
       if (newChar == 0xA) {
         // read in a command if sent via the pi
