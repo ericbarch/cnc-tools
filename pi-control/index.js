@@ -21,7 +21,7 @@ for (let i = 0; i < 4; i ++) {
 // init serialport
 var port = new SerialPort("/dev/serial0", {
   baudRate: 115200,
-  parser: SerialPort.parsers.byteDelimiter([13,10])
+  parser: SerialPort.parsers.readline('\n')
 });
 
 port.on('data', function (data) {
