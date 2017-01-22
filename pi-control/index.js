@@ -16,6 +16,7 @@ let relays = [];
 // init gpio (defaulted to pulldown)
 for (let i = 0; i < 4; i ++) {
   relays.push(new Gpio(RELAY_PINS[i], 'out'));
+  relays[i].write(1);
 }
 
 // init serialport
@@ -43,7 +44,7 @@ io.on('connection', function(socket){
     const relayIndex = relayNum - 1;
     
     if (state === 'off') {
-      relays[relayIndex].write(0, function (err) {
+      relays[relayIndex].write(1, function (err) {
         if (err) {
           console.log('Relay ' + relayNum + ' err: ' + err);
         } else {
@@ -51,7 +52,7 @@ io.on('connection', function(socket){
         }
       });
     } else if (state === 'on') {
-      relays[relayIndex].write(1, function (err) {
+      relays[relayIndex].write(0, function (err) {
         if (err) {
           console.log('Relay ' + relayNum + ' err: ' + err);
         } else {
@@ -59,7 +60,7 @@ io.on('connection', function(socket){
         }
       });
     } else if (state === 'on5') {
-      relays[relayIndex].write(1, function (err) {
+      relays[relayIndex].write(0, function (err) {
         if (err) {
           console.log('Relay ' + relayNum + ' err: ' + err);
         } else {
@@ -67,7 +68,7 @@ io.on('connection', function(socket){
           console.log('Setting timer for 5 seconds to turn back off...');
 
           setTimeout(function () {
-            relays[relayIndex].write(0, function (err) {
+            relays[relayIndex].write(1, function (err) {
               if (err) {
                 console.log('Relay ' + relayNum + ' err: ' + err);
               } else {
