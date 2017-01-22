@@ -17,7 +17,7 @@ File cncProgram;
 #define CHAR_DELAY_MS 2
 
 byte mac[] = {0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xEE};
-IPAddress ip(192, 168, 1, 50);
+IPAddress ip(192, 168, 1, 143);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 boolean inComment = false;
