@@ -297,7 +297,7 @@ boolean checkForNewFile() {
 }
 
 void checkForSerialData() {
-  if (Serial.available() > 0) {
+  while (Serial.available() > 0) {
     // read the incoming byte:
     byte incomingByte = Serial.read();
 
@@ -347,8 +347,6 @@ void loop() {
 
   // read from the file until there's nothing else in it:
   while (cncProgram.available() && !newProgram) {
-    checkForSerialData();
-
     char newChar = cncProgram.read();
 
     if (newChar == '(')
@@ -363,9 +361,6 @@ void loop() {
         // new program was loaded, break from the loop
         break;
       }
-
-      // check for new serial data
-      checkForSerialData();
     }
 
     if (!newProgram) {
@@ -375,13 +370,16 @@ void loop() {
       // send via telnet to anyone connected
       server.write(newChar);
 
+      // send via serial console
+      Serial.write(newChar);
+
       if (newChar == 0xA) {
+        // read in a command if sent via the pi
+        checkForSerialData();
+        
         // new line, let's send a command if pending
         sendCustomCommandIfPending();
       }
-
-      // send via serial console
-      Serial.write(newChar);
     }
   }
 
