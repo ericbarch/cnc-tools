@@ -55,7 +55,7 @@ function sendPushNotification (cycleTimeSeconds, lineString) {
 
   var msg = {
     title: MACHINE_NAME + ': ' + lineString,
-    message: MACHINE_NAME + ' finished run in ' + hhMmSsCycle + '. Accumulated run time today: ' + hhMmSsTotal + '.'  // required
+    message: MACHINE_NAME + ' finished run in ' + hhMmSsCycle + '. Accumulated run time since reset: ' + hhMmSsTotal + '.'  // required
   };
 
   p.send(msg, function (err, result) {
@@ -98,7 +98,7 @@ io.on('connection', function(socket){
 
   socket.on('setrelay', (relayNum, state) => {
     const relayIndex = relayNum - 1;
-    
+
     if (state === 'off') {
       relays[relayIndex].write(0, function (err) {
         if (err) {
@@ -137,6 +137,10 @@ io.on('connection', function(socket){
     }
   });
 
+  socket.on('resettime', () => {
+    totalRunTimeSeconds = 0;
+  });
+
   socket.on('setcmd', (cmd) => {
     console.log('CMD: ' + cmd);
 
@@ -151,22 +155,5 @@ io.on('connection', function(socket){
   });
 });
 
-// reset total run time var and reschedule reset for midnight
-function resetTotalRunTime () {
-  totalRunTimeSeconds = 0;
-
-  var midnight = new Date();
-  midnight.setHours(24,0,0,0);
-  var now = new Date();
-  var msToMidnight = midnight - now;
-  setTimeout(resetTotalRunTime, msToMidnight);
-}
-
-// schedule timer to reset total run time
-resetTotalRunTime();
-
 // fire up the http server
 server.listen(3000);
-
-
-

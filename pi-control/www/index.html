@@ -67,7 +67,10 @@
                     <div class="form-group">
                         <input type="text" class="form-control" id="custom-command-input"><br>
                         <button type="button" class="btn btn-primary" id="custom-command-btn">Submit</button>
-                    </div>
+                    </div><br>
+
+                    <h4>Reset Accumulated Time</h4>
+                    <button type="button" class="btn btn-primary" id="reset-time-btn">Reset</button><br><br><br><br>
                 </div>
             </div>
 
@@ -107,6 +110,13 @@
             if (socket.connected && cmd.length > 0) {
                 socket.emit('setcmd', cmd);
                 $('#custom-command-input').val('');
+            }
+        });
+
+        // reset timer event
+        $('#reset-time-btn').click(function() {
+            if (socket.connected) {
+                socket.emit('resettime');
             }
         });
 
