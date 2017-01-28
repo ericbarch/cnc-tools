@@ -5,9 +5,10 @@
   "author": "Eric Barch <ebarch@nooplabs.com>",
   "main": "./index.js",
   "dependencies": {
-    "express":              "4.14.x",
-    "serialport":           "4.0.x",
-    "socket.io":            "1.7.x",
-    "onoff":                "1.1.x"
+    "express": "4.14.x",
+    "onoff": "1.1.x",
+    "pushover-notifications": "^0.2.4",
+    "serialport": "4.0.x",
+    "socket.io": "1.7.x"
   }
 }
