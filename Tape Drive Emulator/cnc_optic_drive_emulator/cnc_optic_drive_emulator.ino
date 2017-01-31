@@ -354,6 +354,18 @@ void loop() {
     else if (newChar == ')')
       inComment = false;
 
+    // send via telnet to anyone connected
+    server.write(newChar);
+
+    // send via serial console
+    Serial1.write(newChar);
+
+    // don't bother seeing if the machine is busy if this is just a comment
+    // (keep reading the file)
+    if (inComment) {
+      continue;
+    }
+
     // wait for tape feed to go high
     while (digitalRead(TAPE_FEED_PIN) == LOW) {
       // while we're at it, check for a new file load
@@ -364,14 +376,7 @@ void loop() {
     }
 
     if (!newProgram) {
-      if (!inComment)
-        sendChar(newChar);
-
-      // send via telnet to anyone connected
-      server.write(newChar);
-
-      // send via serial console
-      Serial1.write(newChar);
+      sendChar(newChar);
 
       if (newChar == 0xA) {
         // read in a command if sent via the pi
